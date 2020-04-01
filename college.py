@@ -171,14 +171,33 @@ class College_window(QMainWindow, Ui_CollegeWindow):
             for i, event in enumerate(events):
                 m_pb_single = member_pb[event]['single']
                 m_pb_avg = member_pb[event]['avg']
-                try: curr_single = format_time(current_record[2*i].split("%*")[0])
-                except: curr_single = float('inf')
-                try: curr_avg = format_time(current_record[2*i+1].split("%*")[0])
-                except: curr_avg = float('inf')
-                if m_pb_single[0] < curr_single:
-                    current_record[2*i] = '%*'.join([m_pb_single[1], member[0], m_pb_single[2], m_pb_single[3]])
-                if m_pb_avg[0] < curr_avg:
-                    current_record[2*i+1] = '%*'.join([m_pb_avg[1], member[0], m_pb_avg[2], m_pb_avg[3]])
+                try: 
+                    curr_single = current_record[2*i].split("%*")[0]
+                    if not isinstance(curr_single, list): curr_single = format_time(curr_single)
+                except: 
+                    if i == 16: curr_single = [float('-inf'), float('inf')]
+                    else: curr_single = float('inf')
+                try: 
+                    curr_avg = current_record[2*i+1].split("%*")[0]
+                    if not isinstance(curr_avg, list): curr_avg = format_time(curr_avg)
+                except: 
+                    if i == 16: curr_avg = [float('-inf'), float('inf')] 
+                    else: curr_avg = float('inf')
+                # print(m_pb_single, m_pb_avg)
+                # print(curr_single, curr_avg)
+                if i == 16:   # 多盲计分
+                    # print(m_pb_single, m_pb_avg)
+                    # print(curr_single, curr_avg)
+                    if m_pb_single[0][0] > curr_single[0] or (m_pb_single[0][0] == curr_single[0] and m_pb_single[0][1] < curr_single[1]):
+                        current_record[2*i] = '%*'.join([m_pb_single[1], member[0], m_pb_single[2], m_pb_single[3]])
+                    if m_pb_avg[0][0] > curr_avg[0] or (m_pb_avg[0][0] == curr_avg[0] and m_pb_avg[0][1] < curr_avg[1]):
+                        current_record[2*i] = '%*'.join([m_pb_avg[1], member[0], m_pb_avg[2], m_pb_avg[3]]) 
+                else:
+                    if m_pb_single[0] < curr_single:
+                        current_record[2*i] = '%*'.join([m_pb_single[1], member[0], m_pb_single[2], m_pb_single[3]])
+                    if m_pb_avg[0] < curr_avg:
+                        current_record[2*i+1] = '%*'.join([m_pb_avg[1], member[0], m_pb_avg[2], m_pb_avg[3]])
+                # print(current_record, '\n')
             # print(current_record, '\n')
         table_title = ['s333', 'a333', 's222', 'a222', 's444', 'a444', 's555', 'a555', 's666', 'a666', 's777', 'a777', 's333bf', 'a333bf', 's333fm', 'a333fm', 's333oh', 'a333oh', 'sclock', 'aclock', 'sminx', 'aminx', 'spyram', 'apyram', 'sskewb', 'askewb', 'ssq1', 'asq1', 's444bf', 'a444bf', 's555bf', 'a555bf', 's333mbf', 'a333mbf']
         for i in range(len(table_title)):
@@ -198,6 +217,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     # college_list_window = College_List_window()
     # college_list_window.show()
-    college_window = College_window('上海交通大学')
+    college_window = College_window('上海师范大学')
     college_window.show()
     sys.exit(app.exec_())

@@ -117,6 +117,8 @@ class Main_window(QMainWindow, Ui_MainWindow):
         for i in range(1, 18):
             try:
                 record = temp[i].split()
+                if i == 17:  # 多盲显示
+                    record = [f'{record[0]} {record[1]}'] + record[2:]
                 for j in range(4):
                     new = QTableWidgetItem(record[j])
                     self.tableWidget.setItem(i-1, j, new)
@@ -143,9 +145,11 @@ class Main_window(QMainWindow, Ui_MainWindow):
         for i in range(1, 18):
             try:
                 record = temp[i].split()
+                if i == 17:  # 多盲显示
+                    record = [f'{record[0]} {record[1]}'] + record[2:]
                 for j in range(4):
                     try:
-                        if record[j] != '*':
+                        if  not '*' in record[j]:
                             new = QTableWidgetItem(record[j])
                             self.tableWidget_3.setItem(i-1, j, new)
                         else:
@@ -182,6 +186,8 @@ class Main_window(QMainWindow, Ui_MainWindow):
         for i in range(1, 18):
             try:
                 record = temp[i].split()
+                if i == 17:  # 多盲显示
+                    record = [f'{record[0]} {record[1]}'] + record[2:]
                 for j in range(4):
                     new = QTableWidgetItem(record[j])
                     
@@ -200,10 +206,12 @@ class Main_window(QMainWindow, Ui_MainWindow):
         for i in range(1, 18):
             try:
                 record = temp[i].split()
+                if i == 17:  # 多盲显示
+                    record = [f'{record[0]} {record[1]}'] + record[2:]
                 # print(i, record)
                 for j in range(4):
                     try:
-                        if record[j] != '*':
+                        if  not '*' in record[j]:
                             new = QTableWidgetItem(record[j])
                             self.tableWidget_3.setItem(i-1, j, new)
                         else:
@@ -292,6 +300,8 @@ class Main_Other_window(QMainWindow, Ui_MainOtherWindow):
         for i in range(1, 18):
             try:
                 record = temp[i].split()
+                if i == 17:  # 多盲显示
+                    record = [f'{record[0]} {record[1]}'] + record[2:]
                 for j in range(4):
                     new = QTableWidgetItem(record[j])
                     self.tableWidget.setItem(i-1, j, new)
@@ -318,9 +328,12 @@ class Main_Other_window(QMainWindow, Ui_MainOtherWindow):
         for i in range(1, 18):
             try:
                 record = temp[i].split()
+                if i == 17:  # 多盲显示
+                    record = [f'{record[0]} {record[1]}'] + record[2:]
                 for j in range(4):
                     try:
-                        if record[j] != '*':
+                        if not '*' in record[j]:
+                            # if i == 17: print(record[j])
                             new = QTableWidgetItem(record[j])
                             self.tableWidget_3.setItem(i-1, j, new)
                     except: pass
@@ -452,8 +465,9 @@ class Login_window(QMainWindow, Ui_LoginWindow):
 
 if __name__ =='__main__':
     app = QApplication(sys.argv)
+
     # main_window = Main_window()
-    # main_window.init_table('sck')
+    # main_window.init_table('ly')
     # main_window.show()
 
     login_window = Login_window()
@@ -461,4 +475,5 @@ if __name__ =='__main__':
 
     # main_other_window = Main_Other_window('sck')
     # main_other_window.show()
+
     sys.exit(app.exec_())

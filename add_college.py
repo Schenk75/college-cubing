@@ -100,6 +100,17 @@ def delete_table(caDB):
     conn.commit()
     conn.close()
 
+# 根据用户名删除一个人
+def delete_person(account_id):
+    conn = sqlite3.connect(caDB)
+    cursor = conn.cursor()
+    cursor.execute(f"SELECT wcaid FROM userTable WHERE id='{account_id}'")
+    wcaid = cursor.fetchall()[0][0]
+    cursor.execute(f"DELETE FROM userTable WHERE id='{account_id}'")
+    cursor.execute(f"DELETE FROM wcaTable WHERE wcaid='{wcaid}'")
+    cursor.execute(f"DELETE FROM pbTable WHERE id='{account_id}'")
+    conn.commit()
+    conn.close()
 
 if __name__ =='__main__':
     caDB = 'sqlDB/caDB.db'
@@ -109,9 +120,11 @@ if __name__ =='__main__':
     # for college in college_list:
     #     add_college(college)
 
-    college = input('输入高校名：(退出按q)')
-    while college not in 'qQ':
-        add_college(college)
-        college = input('输入高校名：(退出按q)')
+    # college = input('输入高校名：(退出按q)')
+    # while college not in 'qQ':
+    #     add_college(college)
+    #     college = input('输入高校名：(退出按q)')
 
     # delete_table(caDB)
+
+    delete_person('ly')

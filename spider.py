@@ -73,6 +73,7 @@ def get_best_oncampus(wcaid, entertime, leavetime):
     events = ['333', '222', '444', '555', '666', '777', '333bf', '333fm', '333oh', 'clock', 'minx', 'pyram', 'skewb', 'sq1', '444bf', '555bf', '333mbf']
     for e in events:
         personal_best[e] = {'single':[float('inf'), '', '', ''], 'avg':[float('inf'), '', '', '']}
+    personal_best['333mbf'] = {'single':[[float('-inf'), float('inf')], '', '', ''], 'avg':[[float('-inf'), float('inf')], '', '', '']}  # 多盲计分
         
     tbody_list = soup('tbody')
     for tbody in tbody_list[2:]:
@@ -87,23 +88,44 @@ def get_best_oncampus(wcaid, entertime, leavetime):
                 comp = temp
             date = comp_date_dic[comp]
             if int(entertime) < int(date) < int(leavetime):
-                try:
-                    single = tr.find('td', {'class':'single'}).text.strip()
-                    single_time = format_time(single)
-                except: single = single_time = float('inf')
-                try: 
-                    avg = tr.find('td', {'class':'average'}).text.strip()
-                    avg_time = format_time(avg)
-                except: avg = avg_time = float('inf')
+                if event == '333mbf':      # 多盲计分
+                    try:
+                        single = tr.find('td', {'class':'single'}).text.strip()
+                        temp = single.split()
+                        score = 2 * int(temp[0].split('/')[0]) - int(temp[0].split('/')[1])
+                        single_time = [score, format_time(temp[1])]
+                    except: single = single_time = [float('-inf'), float('inf')]
+                    try: 
+                        avg = tr.find('td', {'class':'average'}).text.strip()
+                        temp = avg.split()
+                        score = 2 * int(temp[0].split('/')[0]) - int(temp[0].split('/')[1])
+                        avg_time = [score, format_time(temp[1])]
+                    except: avg = avg_time = [float('-inf'), float('inf')]
+                    # print(single_time, single, comp)
+                else:
+                    try:
+                        single = tr.find('td', {'class':'single'}).text.strip()
+                        single_time = format_time(single)
+                    except: single = single_time = float('inf')
+                    try: 
+                        avg = tr.find('td', {'class':'average'}).text.strip()
+                        avg_time = format_time(avg)
+                    except: avg = avg_time = float('inf')
                 # print(event, comp, single_time, avg_time)
-                if single_time < personal_best[event]['single'][0]:
-                    personal_best[event]['single'] = [single_time, single, comp, date]
-                if avg_time < personal_best[event]['avg'][0]:
-                    personal_best[event]['avg'] = [avg_time, avg, comp, date]
+                if event == '333mbf':    # 多盲计分
+                    if single_time[0] > personal_best[event]['single'][0][0] or (single_time[0] == personal_best[event]['single'][0][0] and single_time[1] < personal_best[event]['single'][0][1]):
+                        personal_best[event]['single'] = [single_time, single, comp, date]
+                    if avg_time[0] > personal_best[event]['avg'][0][0] or (avg_time[0] == personal_best[event]['avg'][0][0] and avg_time[1] < personal_best[event]['avg'][0][1]):
+                        personal_best[event]['avg'] = [single_time, single, comp, date]
+                else:
+                    if single_time < personal_best[event]['single'][0]:
+                        personal_best[event]['single'] = [single_time, single, comp, date]
+                    if avg_time < personal_best[event]['avg'][0]:
+                        personal_best[event]['avg'] = [avg_time, avg, comp, date]
     return personal_best
 
 if __name__ =='__main__':
 
     # pprint(get_best('2014wenc01'))
-    res = get_best_oncampus('2012DONG02', '20130910', '20200701')
+    res = get_best_oncampus('2013LINK01', '20130910', '20210701')
     pprint(res)
