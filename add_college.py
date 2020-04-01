@@ -1,20 +1,18 @@
 import sqlite3
 
-caDB = 'sqlDB/caDB.db'
-
 # 初始化数据库
-def init_db():
+def init_db(caDB):
     conn = sqlite3.connect(caDB)
     cursor = conn.cursor()
-    # cursor.execute('''CREATE TABLE userTable (
-    #                     id text primary key,
-    #                     name text not null,
-    #                     password text not null,
-    #                     college text not null,
-    #                     entertime text not null,
-    #                     leavetime text not null,
-    #                     wcaid text
-    #                 );''')
+    cursor.execute('''CREATE TABLE userTable (
+                        id text primary key,
+                        name text not null,
+                        password text not null,
+                        college text not null,
+                        entertime text not null,
+                        leavetime text not null,
+                        wcaid text
+                    );''')
     cursor.execute('''CREATE TABLE collegeTable (   
                         name text primary key,
                         s333 text, a333 text,
@@ -35,52 +33,50 @@ def init_db():
                         s555bf text, a555bf text,
                         s333mbf text, a333mbf text
                     );''')
-    # cursor.execute('''CREATE TABLE wcaTable (
-    #                     wcaid text primary key,
-    #                     E333 text,
-    #                     E222 text,
-    #                     E444 text,
-    #                     E555 text,
-    #                     E666 text,
-    #                     E777 text,
-    #                     E333oh text,
-    #                     E333fm text,
-    #                     E333bf text,
-    #                     Esq1 text,
-    #                     Eskewb text,
-    #                     Epyram text,
-    #                     Eminx text,
-    #                     Eclock text,
-    #                     E444bf text,
-    #                     E555bf text,
-    #                     E333mbf text
-    #                 );''')
-    # cursor.execute('''CREATE TABLE pbTable (
-    #                     id text primary key,
-    #                     E333 text,
-    #                     E222 text,
-    #                     E444 text,
-    #                     E555 text,
-    #                     E666 text,
-    #                     E777 text,
-    #                     E333oh text,
-    #                     E333fm text,
-    #                     E333bf text,
-    #                     Esq1 text,
-    #                     Eskewb text,
-    #                     Epyram text,
-    #                     Eminx text,
-    #                     Eclock text,
-    #                     E444bf text,
-    #                     E555bf text,
-    #                     E333mbf text
-    #                 );''')
+    cursor.execute('''CREATE TABLE wcaTable (
+                        wcaid text primary key,
+                        E333 text,
+                        E222 text,
+                        E444 text,
+                        E555 text,
+                        E666 text,
+                        E777 text,
+                        E333bf text,
+                        E333fm text,
+                        E333oh text,
+                        Eclock text,
+                        Eminx text,
+                        Epyram text,
+                        Eskewb text,
+                        Esq1 text,
+                        E444bf text,
+                        E555bf text,
+                        E333mbf text
+                    );''')
+    cursor.execute('''CREATE TABLE pbTable (
+                        id text primary key,
+                        E333 text,
+                        E222 text,
+                        E444 text,
+                        E555 text,
+                        E666 text,
+                        E777 text,
+                        E333bf text,
+                        E333fm text,
+                        E333oh text,
+                        Eclock text,
+                        Eminx text,
+                        Epyram text,
+                        Eskewb text,
+                        Esq1 text,
+                        E444bf text,
+                        E555bf text,
+                        E333mbf text
+                    );''')
     conn.close()
 
 # 手动添加高校
-def add_college(college):
-    import sqlite3
-    caDB = 'sqlDB/caDB.db'
+def add_college(college, caDB='sqlDB/caDB.db'):
     conn = sqlite3.connect(caDB)
     cursor = conn.cursor()
 
@@ -91,11 +87,23 @@ def add_college(college):
         conn.commit()
         print('添加成功')
     else: print('添加失败，该高校已存在')
-
     conn.close()
 
+# 删除数据库中所有表的信息
+def delete_table(caDB):
+    conn = sqlite3.connect(caDB)
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM wcaTable')
+    cursor.execute('DELETE FROM userTable')
+    cursor.execute('DELETE FROM pbTable')
+    cursor.execute('DELETE FROM collegeTable')
+    conn.commit()
+    conn.close()
+
+
 if __name__ =='__main__':
-    # init_db()
+    caDB = 'sqlDB/caDB.db'
+    # init_db(caDB)
 
     # college_list = ['上海交通大学', '上海大学', '上海工程技术大学', '上海师范大学', '东南大学', '中山大学', '北京大学', '华东师范大学', '华东理工大学', '南京大学', '南开大学', '哈尔滨工业大学', '复旦大学', '武汉大学', '浙江大学', '清华大学', '西安交通大学']
     # for college in college_list:
@@ -106,9 +114,4 @@ if __name__ =='__main__':
         add_college(college)
         college = input('输入高校名：(退出按q)')
 
-    # conn = sqlite3.connect(caDB)
-    # cursor = conn.cursor()
-    # cursor.execute("SELECT name FROM collegeTable")
-    # college_list = [item[0] for item in cursor.fetchall()]
-    # print(college_list)
-    # conn.close()
+    # delete_table(caDB)
