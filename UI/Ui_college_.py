@@ -44,6 +44,9 @@ class Ui_CollegeWindow(object):
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(740, 10, 51, 31))
         self.pushButton.setObjectName("pushButton")
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_2.setGeometry(QtCore.QRect(680, 10, 51, 31))
+        self.pushButton_2.setObjectName("pushButton_2")
         self.CollegeWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(self.CollegeWindow)
@@ -54,3 +57,4 @@ class Ui_CollegeWindow(object):
         CollegeWindow.setWindowTitle(_translate("CollegeWindow", "高校"))
         self.label.setText(_translate("CollegeWindow", "校记录"))
         self.pushButton.setText(_translate("CollegeWindow", "更新"))
+        self.pushButton_2.setText(_translate("CollegeWindow", "导出"))

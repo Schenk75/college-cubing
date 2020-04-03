@@ -112,6 +112,15 @@ def delete_person(account_id):
     conn.commit()
     conn.close()
 
+# 删除某学校的校记录
+def delete_record(college):
+    conn = sqlite3.connect(caDB)
+    cursor = conn.cursor()
+    cursor.execute(f"DELETE FROM collegeTable WHERE name='{college}'")
+    cursor.execute(f"INSERT INTO collegeTable (name) VALUES ('{college}')")
+    conn.commit()
+    conn.close()
+
 if __name__ =='__main__':
     caDB = 'sqlDB/caDB.db'
     # init_db(caDB)
@@ -127,4 +136,6 @@ if __name__ =='__main__':
 
     # delete_table(caDB)
 
-    delete_person('ly')
+    # delete_person('ly')
+    
+    delete_record('上海师范大学')

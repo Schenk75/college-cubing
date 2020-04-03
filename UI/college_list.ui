@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>339</width>
-    <height>591</height>
+    <height>622</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,6 +22,19 @@
       <width>311</width>
       <height>571</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>590</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>校记录PK</string>
     </property>
    </widget>
   </widget>

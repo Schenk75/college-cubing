@@ -1,12 +1,14 @@
 import sys
 import sqlite3
 import datetime
+import csv
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
 from UI.Ui_college_ import Ui_CollegeWindow
 from UI.Ui_college_list import Ui_CollegeListWindow
+from UI.Ui_record_pk import Ui_RecordPKWindow
 from main import *
 from spider import *
 
@@ -19,6 +21,7 @@ class College_List_window(QMainWindow, Ui_CollegeListWindow):
         self.setupUi(self)
         self.setFixedSize(self.width(), self.height())
         self.init_window()
+        self.pushButton.clicked.connect(self.btn_record_pk)
 
     def init_window(self):
         conn = sqlite3.connect(caDB)
@@ -45,6 +48,11 @@ class College_List_window(QMainWindow, Ui_CollegeListWindow):
         self.college_window = College_window(college)
         self.college_window.show()
 
+    # 校记录Pk事件
+    def btn_record_pk(self):
+        self.record_pk_window = Record_PK_window()
+        self.record_pk_window.show()
+
 
 # 单个高校界面
 class College_window(QMainWindow, Ui_CollegeWindow):
@@ -56,6 +64,7 @@ class College_window(QMainWindow, Ui_CollegeWindow):
         self.pushButton.clicked.connect(self.btn_update_record)
         self.init_window()
         self.setFixedSize(self.width(), self.height())
+        self.pushButton_2.clicked.connect(self.btn_export)
 
     # 初始化界面
     def init_window(self):
@@ -200,12 +209,13 @@ class College_window(QMainWindow, Ui_CollegeWindow):
                 # print(current_record, '\n')
             # print(current_record, '\n')
         table_title = ['s333', 'a333', 's222', 'a222', 's444', 'a444', 's555', 'a555', 's666', 'a666', 's777', 'a777', 's333bf', 'a333bf', 's333fm', 'a333fm', 's333oh', 'a333oh', 'sclock', 'aclock', 'sminx', 'aminx', 'spyram', 'apyram', 'sskewb', 'askewb', 'ssq1', 'asq1', 's444bf', 'a444bf', 's555bf', 'a555bf', 's333mbf', 'a333mbf']
+        # 更新数据库中的校记录
         for i in range(len(table_title)):
             cursor.execute(f"UPDATE collegeTable SET {table_title[i]}='{current_record[i]}' WHERE name='{self.college}'")
             conn.commit()
         reply = QMessageBox.information(self, "提示", '更新成功')
         conn.close()
-        self.init_window()
+        self.init_window()  # 刷新界面显示
 
     # 跳转别人的主页事件
     def btn_member(self, account_id):
@@ -213,10 +223,168 @@ class College_window(QMainWindow, Ui_CollegeWindow):
         self.main_other_window = Main_Other_window(account_id)
         self.main_other_window.show()
 
+    # 导出校记录事件
+    def btn_export(self):
+        conn = sqlite3.connect(caDB)
+        cursor = conn.cursor()
+
+        # 获取校记录
+        cursor.execute(f"SELECT * FROM collegeTable WHERE name='{self.college}'")
+        record = list(cursor.fetchall()[0])[1:]
+
+        # 创建文件
+        file_name = f'{self.college}校记录 {str(datetime.date.today())}.csv'
+        f = open(file_name, 'w', encoding='gbk', newline='')
+        csv_writer = csv.writer(f)
+        event_list = ['三阶', '', '二阶', '', '四阶', '', '五阶', '', '六阶', '', '七阶', '', '三盲', '', '最少步', '', '单手', '', '魔表', '', '五魔方', '', '金字塔', '', '斜转', '', 'SQ1', '', '四盲', '', '五盲', '', '多盲', '']
+        csv_writer.writerow(['', '单次', '平均', '姓名', '比赛', '日期'])  # 列名
+        for i, event in enumerate(event_list):
+            try: 
+                record[i] = record[i].split('%*')
+                record[i][3] = '-'.join([record[i][3][:4], record[i][3][4:6], record[i][3][6:]])
+            except: record[i] = ['', '', '', '']
+            if i % 2 == 0:  # 单次
+                content = [event, record[i][0], '', record[i][1], record[i][2], record[i][3]]
+            else:  # 平均
+                content = [event, '', record[i][0], record[i][1], record[i][2], record[i][3]]
+            csv_writer.writerow(content)
+
+        f.close()
+        reply = QMessageBox.information(self, "提示", '导出成功')
+        conn.close()
+
+
+# 校记录PK界面
+class Record_PK_window(QMainWindow, Ui_RecordPKWindow):
+    def __init__(self, parent=None):
+        super(Record_PK_window, self).__init__(parent)
+        self.setupUi(self)
+        self.init_window()
+        self.pushButton.clicked.connect(self.btn_pk)
+        self.setFixedSize(self.width(), self.height())
+
+    # 初始化界面
+    def init_window(self):
+        conn = sqlite3.connect(caDB)
+        cursor = conn.cursor()
+
+        # 添加两个高校选择框
+        cursor.execute("SELECT name FROM collegeTable ORDER BY name DESC")
+        college_list = [item[0] for item in cursor.fetchall()]
+        self.comboBox.addItem('...')
+        self.comboBox.addItems(college_list)
+        self.comboBox_2.addItem('...')
+        self.comboBox_2.addItems(college_list)
+        
+        # 初始化表格
+        self.tableWidget.setColumnCount(2)
+        self.tableWidget.setRowCount(34)
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tableWidget.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableWidget.horizontalHeader().setVisible(False)
+        self.tableWidget.setVerticalHeaderLabels(['三阶', '', '二阶', '', '四阶', '', '五阶', '', '六阶', '', '七阶', '', '三盲', '', '最少步', '', '单手', '', '魔表', '', '五魔方', '', '金字塔', '', '斜转', '', 'SQ1', '', '四盲', '', '五盲', '', '多盲', ''])
+
+        conn.close()
+
+    # PK按钮事件
+    def btn_pk(self):
+        conn = sqlite3.connect(caDB)
+        cursor = conn.cursor()
+        
+        # 获取输入的两所高校
+        college1 = self.comboBox.currentText()
+        college2 = self.comboBox_2.currentText()
+
+        # 获取两所高校的校记录
+        try:
+            cursor.execute(f"SELECT * FROM collegeTable WHERE name='{college1}'")
+            record1 = list(cursor.fetchall()[0])[1:]
+            cursor.execute(f"SELECT * FROM collegeTable WHERE name='{college2}'")
+            record2 = list(cursor.fetchall()[0])[1:]
+        except:
+            reply = QMessageBox.warning(self, "警告", "请选择有效高校！")
+            return
+
+        # 将成绩填入表中，并高亮pk获胜的一项
+        for i in range(len(record1)):
+            # 显示的时间(str)
+            try: time_show1 = record1[i].split('%*')[0]
+            except: time_show1 = ''
+            try: time_show2 = record2[i].split('%*')[0]
+            except: time_show2 = ''
+            # print(time_show1, time_show2)
+
+            # 比较的时间(float)
+            if i > 31:  # 多盲计分
+                time_show1 = time_show1.split()
+                time_show2 = time_show2.split()
+                # print(time_show1, time_show2)
+                # 统计分数和时间
+                try:
+                    score1 = 2 * int(time_show1[0].split('/')[0]) - int(time_show1[0].split('/')[1])
+                    time1 = format_time(time_show1[1])
+                except:
+                    score1, time1 = float('-inf'), float('inf')
+                try:
+                    score2 = 2 * int(time_show2[0].split('/')[0]) - int(time_show2[0].split('/')[1])
+                    time2 = format_time(time_show2[1])
+                except:
+                    score2, time2 = float('-inf'), float('inf')
+                # print(score1, time1)
+                # print(score2, time2)
+                # 加数据
+                if score1 > 0:
+                    time_show1 = QTableWidgetItem(' '.join(time_show1))
+                    self.tableWidget.setItem(i, 0, time_show1)
+                if score2 > 0:
+                    time_show2 = QTableWidgetItem(' '.join(time_show2))
+                    self.tableWidget.setItem(i, 1, time_show2) 
+                # 加高亮
+                try:
+                    if score1 > score2 or (score1 == score2 and time1 < time2): 
+                        self.tableWidget.item(i, 0).setBackground(QBrush(QColor(197,224,180)))
+                    if score1 < score2 or (score1 == score2 and time1 > time2): 
+                        self.tableWidget.item(i, 1).setBackground(QBrush(QColor(197,224,180)))
+                    if score1 == score2 and time1 == time2:
+                        self.tableWidget.item(i, 0).setBackground(QBrush(QColor(197,224,180)))
+                        self.tableWidget.item(i, 1).setBackground(QBrush(QColor(197,224,180)))
+                except: pass
+            else:
+                # 统计时间
+                try: time1 = format_time(time_show1)
+                except: time1 = float('inf')
+                try: time2 = format_time(time_show2)
+                except: time2 = float('inf')
+                # print(time1, time2)
+                # 加数据
+                if time1 < float('inf'):
+                    time_show1 = QTableWidgetItem(time_show1)
+                    self.tableWidget.setItem(i, 0, time_show1)
+                if time2 < float('inf'):
+                    time_show2 = QTableWidgetItem(time_show2)
+                    self.tableWidget.setItem(i, 1, time_show2) 
+                # 加高亮 
+                try:
+                    if time1 < time2: self.tableWidget.item(i ,0).setBackground(QBrush(QColor(197,224,180)))
+                    elif time1 > time2: self.tableWidget.item(i ,1).setBackground(QBrush(QColor(197,224,180)))
+                    elif time1 == time2:
+                        self.tableWidget.item(i ,0).setBackground(QBrush(QColor(197,224,180)))
+                        self.tableWidget.item(i ,1).setBackground(QBrush(QColor(197,224,180)))
+                except: pass
+                # print(i, time1, time2)
+            # print(i, time1, time2)
+            # break
+        conn.close()
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     # college_list_window = College_List_window()
     # college_list_window.show()
-    college_window = College_window('上海师范大学')
+    college_window = College_window('上海交通大学')
     college_window.show()
+    # record_pk_window = Record_PK_window()
+    # record_pk_window.show()
+
     sys.exit(app.exec_())

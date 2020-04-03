@@ -88,6 +88,7 @@ def get_best_oncampus(wcaid, entertime, leavetime):
                 comp = temp
             date = comp_date_dic[comp]
             if int(entertime) < int(date) < int(leavetime):
+                # 获取一个成绩
                 if event == '333mbf':      # 多盲计分
                     try:
                         single = tr.find('td', {'class':'single'}).text.strip()
@@ -112,6 +113,8 @@ def get_best_oncampus(wcaid, entertime, leavetime):
                         avg_time = format_time(avg)
                     except: avg = avg_time = float('inf')
                 # print(event, comp, single_time, avg_time)
+
+                # 更新个人最好成绩
                 if event == '333mbf':    # 多盲计分
                     if single_time[0] > personal_best[event]['single'][0][0] or (single_time[0] == personal_best[event]['single'][0][0] and single_time[1] < personal_best[event]['single'][0][1]):
                         personal_best[event]['single'] = [single_time, single, comp, date]
